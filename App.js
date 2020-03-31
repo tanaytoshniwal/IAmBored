@@ -1,19 +1,58 @@
 import React from 'react';
 import Container from 'react-native-container';
-import { StyleSheet, Text, Image, View } from 'react-native';
-import { Button } from 'native-base';
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
+import AnimatedLoader from "react-native-animated-loader";
+import axios from 'axios'
+import ProgressiveImage from './components/ProgressiveImage/ProgressiveImage';
+
+const link = 'https://meme-api.herokuapp.com/gimme'
 
 class App extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      loading: false,
+      data: {
+        postLink: "sample data",
+        subreddit: "sample data",
+        title: "sample data",
+        url: 'https://i.pinimg.com/474x/bf/28/45/bf28450fec051c9c1d57ce7eedb8e422.jpg'
+      }
+    }
+  }
+
+  load = () => {
+    this.setState({ loading: true })
+    axios.get(link).then(res => {
+      this.setState({
+        data: res.data,
+        loading: false
+      })
+      console.log(Object.keys(res.data))
+    })
+  }
+
   render() {
     return (
-      <Container style={styles.container}>
-        <View style={styles.imageView}>
-          <Image style={styles.image} source={{ uri: 'https://i.pinimg.com/474x/bf/28/45/bf28450fec051c9c1d57ce7eedb8e422.jpg' }} />
-        </View>
-        <Button style={styles.button}>
-          <Text style={styles.btnText}>Get another meme!</Text>
-        </Button>
-      </Container>
+      <>
+        <Container style={styles.container}>
+          <View style={styles.logo}>
+            <Image style={styles.logoImg} source={{ uri: 'https://tanaytoshniwal.com/logo.png' }} />
+          </View>
+          <View style={styles.imageView}>
+            <ProgressiveImage source={{ uri: this.state.data.url }} />
+          </View>
+          <TouchableOpacity style={styles.button} onPress={() => this.load()}>
+            <Text style={styles.btnText}>Get another meme!</Text>
+          </TouchableOpacity>
+        </Container>
+        <AnimatedLoader
+          visible={this.state.loading}
+          overlayColor="rgba(255,255,255,0.75)"
+          source={require("./loader.json")}
+          animationStyle={styles.lottie}
+          speed={1} />
+      </>
     );
   }
 };
@@ -29,8 +68,10 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#E74292",
     width: '50%',
+    height: 39,
     borderRadius: 25,
     justifyContent: 'center',
+    alignItems: 'center',
     elevation: 9
   },
   btnText: {
@@ -38,13 +79,23 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600'
   },
-  image: {
-    width: 360,
-    height: 360,
-    resizeMode: 'contain'
-  },
   imageView: {
     marginBottom: 25
+  },
+  logo: {
+    position: 'absolute',
+    backgroundColor: '#fff',
+    width: 75,
+    height: 75,
+    top: 0,
+    marginTop: 25,
+    borderRadius: 45,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  logoImg: {
+    width: 50,
+    height: 50
   }
 })
 
